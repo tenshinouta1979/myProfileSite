@@ -1,0 +1,45 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ghcr.io/tenshinouta1979/myprofilesite
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            SITE_URL=${{ vars.SITE_URL }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+# After push, Watchtower on the mini PC pulls :latest within ~60s and
+# restarts profile-app automatically. Set repo variable SITE_URL
+# (Settings > Secrets and variables > Actions > Variables) to
+# https://<your-domain> so OpenGraph URLs are absolute.

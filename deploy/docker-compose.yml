@@ -1,0 +1,119 @@
+# Homelab profile-site stack.
+# Runs entirely on the Ubuntu mini PC. No host ports 80/443 are published:
+# the only ingress is cloudflared -> nginx on the internal "homelab-net".
+#
+#   cp .env.example .env   # fill in real values
+#   docker compose up -d
+
+services:
+  profile-app:
+    image: ${APP_IMAGE:-ghcr.io/tenshinouta1979/myprofilesite:latest}
+    container_name: profile-app
+    restart: unless-stopped
+    networks: [homelab-net]
+    environment:
+      # Optional: token for the /api/github route to avoid unauthenticated rate limits.
+      GITHUB_TOKEN: ${GITHUB_API_TOKEN:-}
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    networks: [homelab-net]
+    # No "ports:" mapping — deliberately unreachable from the host network.
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - profile-app
+      - umami
+      - uptime-kuma
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks: [homelab-net]
+    # Token passed via env so it does not appear in `docker inspect` command args.
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - nginx
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: umami
+    restart: unless-stopped
+    networks: [homelab-net]
+    environment:
+      DATABASE_URL: postgresql://umami:${POSTGRES_PASSWORD}@umami-db:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET}
+    depends_on:
+      umami-db:
+        condition: service_healthy
+
+  umami-db:
+    image: postgres:15-alpine
+    container_name: umami-db
+    restart: unless-stopped
+    networks: [homelab-net]
+    environment:
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: umami
+    volumes:
+      - umami-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    networks: [homelab-net]
+    volumes:
+      - uptime-kuma-data:/app/data
+    # Socket mount intentionally omitted: keep container monitoring via HTTP checks.
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    networks: [homelab-net]
+    # localhost-only: reach it with `ssh -L 8888:127.0.0.1:8888 user@mini-pc`
+    ports:
+      - "127.0.0.1:8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    networks: [homelab-net]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Required only if the GHCR package is private; create ~/.docker/config.json
+      # on the host via `docker login ghcr.io` first (see DEPLOYMENT.md).
+      - ${HOME}/.docker/config.json:/config.json:ro
+    command: --cleanup --interval 60 --label-enable
+    # --label-enable: only containers with com.centurylinklabs.watchtower.enable=true
+    # (currently just profile-app) are auto-updated.
+
+networks:
+  homelab-net:
+    driver: bridge
+
+volumes:
+  umami-db-data:
+  uptime-kuma-data:
