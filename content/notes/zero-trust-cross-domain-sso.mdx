@@ -1,0 +1,22 @@
+---
+title: Designing Zero-Trust Cross-Domain SSO for Public Sector Platforms
+description: Federation boundaries, identity contracts, and the rollout choices that keep public-sector services available.
+date: '2026-10-15'
+tag: Identity
+---
+
+Single sign-on is a way to reduce friction, not a reason to treat services as though they share one trust boundary. For public-sector platforms, each organization still needs control over which identities it accepts and what those identities can do.
+
+## Write the identity contract first
+
+Document which identity providers a service trusts, how it matches an account, and who owns the lifecycle of that account. Use a stable subject identifier within its issuer’s namespace. An email address can change and is not a good account key.
+
+A successful sign-in tells the service who the user is. Application authorization remains a separate decision. Keep role assignment and policy ownership close to the application so a change to an upstream directory cannot silently grant access to protected functions.
+
+## Make failures observable
+
+Define how an expired session, unavailable provider, or changed claim affects each user journey. Log a correlation ID and the policy outcome without logging tokens or personal claims. Make it possible for the support team to tell a configuration issue from an ordinary access denial.
+
+## Roll out one boundary at a time
+
+Start with a small set of users and a single service. Agree on sign-in success, account-linking accuracy, and support ticket volume before expanding. Have an explicit rollback plan that preserves existing access without bypassing authorization checks.

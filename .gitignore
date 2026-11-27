@@ -1,0 +1,7 @@
+/node_modules/
+/.next/
+/screenshots-local/
+/next-env.d.ts
+*.tsbuildinfo
+*.log
+.env*
