@@ -7,6 +7,7 @@ export const profile = {
   githubUsername: 'tenshinouta1979',
   linkedin: 'https://linkedin.com/in/tenshinouta',
   notion: 'https://lovely-pike-409.notion.site/Ryan-Lee-Space-3fb2da87c50d40aebf5007d73ac8ceb8',
+  website: 'https://ryanleetech.com',
   resume: '/resume-ryan-lee.pdf',
   bio: 'I bring 20+ years in technology, including 15+ years in architecture and platform engineering. I help government and enterprise teams modernize Azure and AWS platforms, secure identity across systems, and improve how they deliver software. My hands-on background spans frontend and backend development, database administration, and data engineering.',
   strengths: ['Platform & Cloud Strategy', 'Enterprise Modernization', 'Zero-Trust & IAM', 'Kubernetes & IaC', 'Engineering Leadership'],

@@ -15,7 +15,7 @@ const links = [
   [profile.email, `mailto:${profile.email}`],
   ['LinkedIn', profile.linkedin],
   ['GitHub', githubProfile],
-  ['Ryan Lee Space', profile.notion],
+  ['ryanleetech.com', profile.website],
 ];
 
 const html = `<!doctype html>
