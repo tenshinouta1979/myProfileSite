@@ -4,6 +4,7 @@ import { profile } from '@/data/resume';
 export const alt = `${profile.name} — ${profile.title}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+export const dynamic = 'force-static';
 
 export default function Image() {
   return new ImageResponse(

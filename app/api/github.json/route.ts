@@ -5,6 +5,8 @@ const username = encodeURIComponent(profile.githubUsername);
 const cache = { revalidate: 3600 };
 const weeks = 13;
 
+export const dynamic = 'force-static';
+
 async function calendar(): Promise<NonNullable<GithubActivity['days']>> {
   const response = await fetch(`https://github.com/users/${username}/contributions`, { next: cache, signal: AbortSignal.timeout(5000) });
   if (!response.ok) throw new Error('GitHub contribution calendar unavailable');

@@ -12,7 +12,7 @@ export function GithubPulse() {
     const controller = new AbortController();
     async function load() {
       try {
-        const response = await fetch('/api/github', { signal: controller.signal });
+        const response = await fetch('/api/github.json', { signal: controller.signal });
         if (!response.ok) throw new Error('Activity unavailable');
         const data: GithubActivity = await response.json();
         if (!controller.signal.aborted) setActivity(data);

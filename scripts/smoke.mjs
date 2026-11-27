@@ -55,14 +55,14 @@ try {
   }
 
   const page = await browser.newPage({ baseURL });
-  await page.route('**/api/github', (route) => route.fulfill({ status: 503 }));
+  await page.route('**/api/github.json', (route) => route.fulfill({ status: 503 }));
   await page.goto('/');
   await page.getByText('Contribution calendar unavailable. View activity on GitHub.').waitFor();
   await page.getByText('Language breakdown unavailable.').waitFor();
   assert.match(await page.getByRole('link', { name: /^@/ }).getAttribute('href'), /^https:\/\/github\.com\//);
   console.log('PASS GitHub unavailable: both fallbacks and profile link visible');
-  await page.unroute('**/api/github');
-  await page.route('**/api/github', (route) => route.fulfill({ json: { days: [{ date: '2026-10-15', level: 2 }], languages: [{ name: 'TypeScript', repos: 2 }] } }));
+  await page.unroute('**/api/github.json');
+  await page.route('**/api/github.json', (route) => route.fulfill({ json: { days: [{ date: '2026-10-15', level: 2 }], languages: [{ name: 'TypeScript', repos: 2 }] } }));
   await page.reload();
   await page.getByRole('img', { name: /1 active days/ }).waitFor();
   await page.getByText('TypeScript', { exact: true }).waitFor();
