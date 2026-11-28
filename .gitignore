@@ -5,3 +5,5 @@
 *.tsbuildinfo
 *.log
 .env*
+/out/
+/.wrangler/
