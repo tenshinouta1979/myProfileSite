@@ -12,7 +12,7 @@ export const profile = {
   bio: 'I bring 20+ years in technology, including 15+ years in architecture and platform engineering. I help government and enterprise teams modernize Azure and AWS platforms, secure identity across systems, and improve how they deliver software. My hands-on background spans frontend and backend development, database administration, and data engineering.',
   strengths: ['Platform & Cloud Strategy', 'Enterprise Modernization', 'Zero-Trust & IAM', 'Kubernetes & IaC', 'Engineering Leadership'],
   education: 'BSc Computer Science · University of Toronto Scarborough',
-  certifications: ['AZ-900', 'AI-900', 'DP-900', 'AWS Cloud Practitioner'],
+  certifications: ['AZ-900', 'AI-900', 'DP-900', 'AWS Cloud Practitioner Essentials'],
   signals: [
     { metric: '15+', label: 'Years in architecture & platforms' },
     { metric: '06+', label: 'Systems federated' },
